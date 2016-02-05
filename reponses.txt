@@ -1,0 +1,11 @@
+3.2.1. Testez votre programme 
+
+1) bind socker_serveur: Address already in use  
+Le bind n'a pas encore eu le temps de libérer l'adresse.
+
+2) L'option -z empêche l'envoir de données. Le serveur ne retourne rien 
+
+3) La commande :telnet ::1 8080 ne fonctionne par car telnet ne fonctionne que sous IPV6 et
+ nous sommes en IPV4. 
+
+4)Le deuxième client ne retourne rien car il n'y a pour l'instant qu'un seul 'accept' dans la fonction creer serveur.
