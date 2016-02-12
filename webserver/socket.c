@@ -6,6 +6,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <signal.h>
+#include <stdlib.h>
 #include "socket.h"
 
 int creer_serveur(int port)
@@ -44,11 +45,24 @@ int creer_serveur(int port)
 		perror("accept");
 		/* traitement d ’ erreur */
 	}
-	/* On peut maintenant dialoguer avec le client */
-	const char * message_bienvenue = "Bonjour, bienvenue sur mon serveur\nLa température exterieure est de 14 °C, il est actuellement 8h46 du matin\nPour ceux qui prennent l'avion direction le serveur de Quentin Porion, il est parti en avance,\nNous vous invitons à vous rediriger vers le serveur de Corwin Nolimittometal qui va être en retard.\nNous espérons que vous avez fait bon voyage à bord de notre avion avec Air NoCl23,\n et nous espérons vous revoir bientôt.\nÀ une prochaine fois !";
+
+	int newP; 
+	
+	if((newP=fork()) == 0){
+
+		/* On peut maintenant dialoguer avec le client */
+	const char * message_bienvenue = "Bonjour, bienvenue sur mon serveur\nLa température exterieure est de 14 °C, il est actuellement 8h46 du matin\nPour ceux qui prennent l'avion direction le serveur de Quentin Porion, il est parti en avance,\nNous vous invitons à vous rediriger vers le serveur de Corwin Nolimittometal qui va être en retard.\nNous espérons que vous avez fait bon voyage à bord de notre avion avec Air NoCl23,\n et nous espérons vous revoir bientôt.\nÀ une prochaine fois !\n";
 	write(socket_client, message_bienvenue, strlen(message_bienvenue));
+		exit(0);
+	}else{
+
+	close(socket_client);
+	}
+	
 	return socket_serveur;
 }
+
+
 
 	void initialiser_signaux(void)
 	{
