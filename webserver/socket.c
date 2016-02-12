@@ -5,6 +5,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>
+#include <signal.h>
 #include "socket.h"
 
 int creer_serveur(int port)
@@ -24,7 +25,7 @@ int creer_serveur(int port)
 	saddr.sin_addr.s_addr = INADDR_ANY; /* écoute sur toutes les interfaces */
 	int optval = 1;
 	if(setsockopt(socket_serveur, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(int)) == -1) {
-		perror("Can not set SO_REUSEADDR option\n");
+		perror("Can not set SO_REUSEADDR option");
 	}
 	if(bind(socket_serveur, (struct sockaddr *)& saddr, sizeof(saddr)) == -1)
 	{
@@ -49,3 +50,10 @@ int creer_serveur(int port)
 	return socket_serveur;
 }
 
+	void initialiser_signaux(void)
+	{
+		if(signal(SIGPIPE, SIG_IGN) == SIG_ERR)
+		{
+			perror("signal");
+		}
+	}

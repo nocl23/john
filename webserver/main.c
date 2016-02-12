@@ -6,6 +6,7 @@ int main (void)
 {
 	while(1)
 	{
+		initialiser_signaux();
 		creer_serveur(8080);
 	}
 	return 0;
