@@ -20,14 +20,16 @@ int creer_serveur(int port)
 		/* traitement de l’erreur */
 	}
 	/* Utilisation de la socket serveur */
-	struct sockaddr_in saddr;
-	saddr.sin_family = AF_INET; /* Socket ipv4 */
-	saddr.sin_port = htons (port); /* Port d’écoute */
-	saddr.sin_addr.s_addr = INADDR_ANY; /* écoute sur toutes les interfaces */
+	
 	int optval = 1;
 	if(setsockopt(socket_serveur, SOL_SOCKET, SO_REUSEADDR, &optval, sizeof(int)) == -1) {
 		perror("Can not set SO_REUSEADDR option");
 	}
+	struct sockaddr_in saddr;
+	saddr.sin_family = AF_INET; /* Socket ipv4 */
+	saddr.sin_port = htons (port); /* Port d’écoute */
+	saddr.sin_addr.s_addr = INADDR_ANY; /* écoute sur toutes les interfaces */
+
 	if(bind(socket_serveur, (struct sockaddr *)& saddr, sizeof(saddr)) == -1)
 	{
 		perror("bind socker_serveur");
@@ -38,36 +40,14 @@ int creer_serveur(int port)
 		perror("listen socket_serveur");
 		/* traitement d’erreur */
 	}
-	int socket_client ;
-	socket_client = accept (socket_serveur, NULL, NULL);
-	if(socket_client == -1)
-	{
-		perror("accept");
-		/* traitement d ’ erreur */
-	}
-
-	int newP; 
 	
-	if((newP=fork()) == 0){
+	
 
-		/* On peut maintenant dialoguer avec le client */
-	const char * message_bienvenue = "Bonjour, bienvenue sur mon serveur\nLa température exterieure est de 14 °C, il est actuellement 8h46 du matin\nPour ceux qui prennent l'avion direction le serveur de Quentin Porion, il est parti en avance,\nNous vous invitons à vous rediriger vers le serveur de Corwin Nolimittometal qui va être en retard.\nNous espérons que vous avez fait bon voyage à bord de notre avion avec Air NoCl23,\n et nous espérons vous revoir bientôt.\nÀ une prochaine fois !\n";
-	write(socket_client, message_bienvenue, strlen(message_bienvenue));
-		exit(0);
-	}else{
-
-	close(socket_client);
-	}
+	
 	
 	return socket_serveur;
 }
 
 
 
-	void initialiser_signaux(void)
-	{
-		if(signal(SIGPIPE, SIG_IGN) == SIG_ERR)
-		{
-			perror("signal");
-		}
-	}
+	
