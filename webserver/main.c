@@ -80,7 +80,7 @@ int main (void)
 		}else{
 
 			close(socket_client);
-			printf("socket_client fermee\n");
+			printf("socket_client fermeeeee\n");
 
 		}
 
