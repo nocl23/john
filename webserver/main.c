@@ -11,29 +11,29 @@
 #include "socket.h"
 
 void traitement_signal ( int sig )
-	{
-		
-		int pid;
-		int status;
-		if((pid=waitpid(-1,&status,WNOHANG))>0){
-			printf ( " Signal % d reçu \n " , sig );
-		}
+{
 
-
-
+	int pid;
+	int status;
+	if((pid=waitpid(-1,&status,WNOHANG))>0){
+		printf ( " Signal % d reçu \n " , sig );
 	}
 
-	void initialiser_signaux(void)
+
+
+}
+
+void initialiser_signaux(void)
+{
+	struct sigaction sa ;
+	sa.sa_handler = traitement_signal ;
+	sigemptyset (&sa.sa_mask);
+	sa.sa_flags = SA_RESTART ;
+	if ( sigaction ( SIGCHLD , & sa , NULL ) == -1)
 	{
-		struct sigaction sa ;
-		sa.sa_handler = traitement_signal ;
-		sigemptyset (&sa.sa_mask);
-		sa.sa_flags = SA_RESTART ;
-		if ( sigaction ( SIGCHLD , & sa , NULL ) == -1)
-		{
-			perror ("sigaction(SIGCHLD)");
-		}
+		perror ("sigaction(SIGCHLD)");
 	}
+}
 
 
 
@@ -43,8 +43,9 @@ int main (void)
 	int socket_serveur = creer_serveur(8080);
 	int socket_client ;
 	
-	 char msg_client[20];
+	char msg_client[20];
 	initialiser_signaux();
+	//int status;
 
 	while(1)
 	{
@@ -56,28 +57,35 @@ int main (void)
 			perror("accept");
 		/* traitement d ’ erreur */
 		}
-		int newP; 
+		pid_t newP; 
 
 		if((newP=fork()) == 0){
 			FILE *flux_socket_client = fdopen(socket_client,"w+");
 
 		/* On peut maintenant dialoguer avec le client */
 			const char * message_bienvenue = "Bonjour, bienvenue sur mon serveur\nLa température exterieure est de 14 °C, il est actuellement 8h46 du matin\nPour ceux qui prennent l'avion direction le serveur de Quentin Porion, il est parti en avance,\nNous vous invitons à vous rediriger vers le serveur de Corwin Nolimittometal qui va être en retard.\nNous espérons que vous avez fait bon voyage à bord de notre avion avec Air NoCl23,\n et nous espérons vous revoir bientôt.\nÀ une prochaine fois !\n";
-			fwrite(message_bienvenue,1,strlen(message_bienvenue),flux_socket_client);
+			
+			printf("%s\n",message_bienvenue );
 
-			while(1){
+			while(fgets( msg_client , sizeof(msg_client),flux_socket_client)!=NULL){
 				
-				fgets( msg_client , sizeof(msg_client),flux_socket_client);
-				fprintf(flux_socket_client,"<john> %s",msg_client);
+				
+				
+				printf("<john> %s",msg_client);
+				
+
+
 				
 
 			}
-
 			fclose(flux_socket_client);
 			close(socket_client);
-
 			exit(0);
+
+			
+			
 		}else{
+
 
 			close(socket_client);
 			printf("socket_client fermeeeee\n");
@@ -87,6 +95,7 @@ int main (void)
 
 
 	}
+
 	close(socket_serveur);
 	return 0;
 }
