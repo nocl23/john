@@ -71,7 +71,7 @@ int main (void)
 				
 				
 				
-				printf("<john> %s",msg_client);
+				printf("%s",msg_client);
 				
 
 
