@@ -42,11 +42,10 @@ int main (void)
 
 	int socket_serveur = creer_serveur(8080);
 	int socket_client ;
-	
+	//char * first_line;
 	char msg_client[20];
 	initialiser_signaux();
-	//int status;
-
+	
 	while(1)
 	{
 
@@ -67,32 +66,28 @@ int main (void)
 			
 			printf("%s\n",message_bienvenue );
 
-			while(fgets( msg_client , sizeof(msg_client),flux_socket_client)!=NULL){
+			fgets( msg_client , sizeof(msg_client),flux_socket_client);
+					printf("%s\n",msg_client );
+				if(strcmp(msg_client,"\n")==0){
+
+					printf("%s\n",msg_client );
+				}
 				
-				
-				
-				printf("%s",msg_client);
-				
+			
+			//printf("%s\n",first_line );
+			//printf("%s",msg_client);
 
 
-				
-
-			}
 			fclose(flux_socket_client);
 			close(socket_client);
 			exit(0);
 
-			
-			
 		}else{
-
 
 			close(socket_client);
 			printf("socket_client fermeeeee\n");
 
 		}
-
-
 
 	}
 
