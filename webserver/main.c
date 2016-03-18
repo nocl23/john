@@ -8,6 +8,7 @@
 #include <signal.h>
 #include <stdlib.h>
 #include <sys/wait.h>
+#include <ctype.h>
 #include "socket.h"
 
 void traitement_signal ( int sig )
@@ -45,6 +46,8 @@ int main (void)
 	//char * first_line;
 	char msg_client[20];
 	initialiser_signaux();
+	int i =0;
+	int nbSpace=0;
 	
 	while(1)
 	{
@@ -67,15 +70,23 @@ int main (void)
 			printf("%s\n",message_bienvenue );
 
 			fgets( msg_client , sizeof(msg_client),flux_socket_client);
-					printf("%s\n",msg_client );
-				if(strcmp(msg_client,"\n")==0){
+
+
+				while(msg_client[i] != '\r' && msg_client[i]!='\n' ){
+				if(isspace(msg_client[i])){
+					nbSpace++;
+				}
+				i++;
+				//printf("%d\n",i );
+				}
+				/*if(strcmp(msg_client,"\n")==0){
 
 					printf("%s\n",msg_client );
-				}
+				}*/
 				
 			
 			//printf("%s\n",first_line );
-			//printf("%s",msg_client);
+			printf("%s",msg_client);
 
 
 			fclose(flux_socket_client);
