@@ -43,11 +43,13 @@ int main (void)
 
 	int socket_serveur = creer_serveur(8080);
 	int socket_client ;
-	//char * first_line;
+	//char *first_line[20];
 	char msg_client[20];
 	initialiser_signaux();
 	int i =0;
 	int nbSpace=0;
+	char *src[20];
+
 	
 	while(1)
 	{
@@ -73,20 +75,20 @@ int main (void)
 
 
 				while(msg_client[i] != '\r' && msg_client[i]!='\n' ){
+
 				if(isspace(msg_client[i])){
 					nbSpace++;
+					//strcpy(*first_line,*src);
+					//printf("%s\n",*first_line );
 				}
-				i++;
-				//printf("%d\n",i );
-				}
-				/*if(strcmp(msg_client,"\n")==0){
-
-					printf("%s\n",msg_client );
-				}*/
+				*src[i]=msg_client[i];
 				
-			
-			//printf("%s\n",first_line );
-			printf("%s",msg_client);
+				i++;
+				
+				}
+				printf("%ssrc\n",*src );
+		
+			printf("%smsgclient",msg_client);
 
 
 			fclose(flux_socket_client);
