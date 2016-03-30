@@ -14,11 +14,11 @@
 void traitement_signal ( int sig )
 {
 
-	int pid;
-	int status;
-	if((pid=waitpid(-1,&status,WNOHANG))>0){
-		printf ( " Signal % d reçu \n " , sig );
-	}
+    int pid;
+    int status;
+    if((pid=waitpid(-1,&status,WNOHANG))>0){
+        printf ( " Signal % d reçu \n " , sig );
+    }
 
 
 
@@ -26,14 +26,14 @@ void traitement_signal ( int sig )
 
 void initialiser_signaux(void)
 {
-	struct sigaction sa ;
-	sa.sa_handler = traitement_signal ;
-	sigemptyset (&sa.sa_mask);
-	sa.sa_flags = SA_RESTART ;
-	if ( sigaction ( SIGCHLD , & sa , NULL ) == -1)
-	{
-		perror ("sigaction(SIGCHLD)");
-	}
+    struct sigaction sa ;
+    sa.sa_handler = traitement_signal ;
+    sigemptyset (&sa.sa_mask);
+    sa.sa_flags = SA_RESTART ;
+    if ( sigaction ( SIGCHLD , & sa , NULL ) == -1)
+    {
+        perror ("sigaction(SIGCHLD)");
+    }
 }
 
 
@@ -41,70 +41,74 @@ void initialiser_signaux(void)
 int main (void)
 {
 
-	int socket_serveur = creer_serveur(8080);
-	int socket_client ;
-	//char *first_line[20];
-	char msg_client[20];
-	initialiser_signaux();
-	int i =0;
-	int nbSpace=0;
-	char *src[20];
+    int socket_serveur = creer_serveur(8080);
+    int socket_client ;
+    //char * first_line;
+    char msg_client[20];
+    initialiser_signaux();
+    pid_t newP; 
+    
+    
+    while(1)
+    {
 
-	
-	while(1)
-	{
+        socket_client = accept (socket_serveur, NULL, NULL);
+        
+        if(socket_client == -1)
+        {
+            perror("accept");
+        /* traitement d ’ erreur */
+        }
+        
+        FILE *flux_socket_client = fdopen(socket_client,"w+");
 
-		socket_client = accept (socket_serveur, NULL, NULL);
-		
-		if(socket_client == -1)
-		{
-			perror("accept");
-		/* traitement d ’ erreur */
-		}
-		pid_t newP; 
-
-		if((newP=fork()) == 0){
-			FILE *flux_socket_client = fdopen(socket_client,"w+");
-
-		/* On peut maintenant dialoguer avec le client */
-			const char * message_bienvenue = "Bonjour, bienvenue sur mon serveur\nLa température exterieure est de 14 °C, il est actuellement 8h46 du matin\nPour ceux qui prennent l'avion direction le serveur de Quentin Porion, il est parti en avance,\nNous vous invitons à vous rediriger vers le serveur de Corwin Nolimittometal qui va être en retard.\nNous espérons que vous avez fait bon voyage à bord de notre avion avec Air NoCl23,\n et nous espérons vous revoir bientôt.\nÀ une prochaine fois !\n";
-			
-			printf("%s\n",message_bienvenue );
-
-			fgets( msg_client , sizeof(msg_client),flux_socket_client);
+        if((newP=fork()) == 0){
 
 
-				while(msg_client[i] != '\r' && msg_client[i]!='\n' ){
+        /* On peut maintenant dialoguer avec le client */
 
-				if(isspace(msg_client[i])){
-					nbSpace++;
-					//strcpy(*first_line,*src);
-					//printf("%s\n",*first_line );
-				}
-				*src[i]=msg_client[i];
-				
-				i++;
-				
-				}
-				printf("%ssrc\n",*src );
-		
-			printf("%smsgclient",msg_client);
+            int nbMots=0;
+            char * mots;
+
+            fgets( msg_client , sizeof(msg_client),flux_socket_client) ;
+            mots = strtok(msg_client," ");
+            
+            while ( mots != NULL ){
+                
+                if( nbMots==0 && strcmp(mots,"GET") == 0){ /*verification du premier mot*/
+                    printf("%s ", mots);
+                    nbMots++;
+                }
+
+                mots = strtok(NULL," ");   /*deuxieme mots*/
+
+                if( nbMots ==1 || strcmp(mots,"/")==0){
+                    printf("%s ", mots);
+                    nbMots++;
+                }
+                mots = strtok (NULL,"\r\n");  /* verification du 3e mot*/
+                if( nbMots ==2 && (strcmp(mots,"HTTP/1.1") == 0 || strcmp(mots,"HTTP/1.0"))){
+                    printf("%s\n",mots);
+                    nbMots++;
+                }
+                
+            }
 
 
-			fclose(flux_socket_client);
-			close(socket_client);
-			exit(0);
 
-		}else{
+            fclose(flux_socket_client);
+            close(socket_client);
+            exit(0);
 
-			close(socket_client);
-			printf("socket_client fermeeeee\n");
+        }else{
 
-		}
+            close(socket_client);
+            //printf("socket_client fermeeeee\n");
 
-	}
+        }
 
-	close(socket_serveur);
-	return 0;
+    }
+
+    close(socket_serveur);
+    return 0;
 }
-
