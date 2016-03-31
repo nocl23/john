@@ -36,7 +36,7 @@ void initialiser_signaux(void)
 	}
 }
 
-void parse_request (char* mess_client,FILE * flux_client){
+int parse_request (char* mess_client,FILE * flux_client){
 	int nbMots=0;
 	char * mots;
            // char * request;
@@ -70,10 +70,16 @@ void parse_request (char* mess_client,FILE * flux_client){
                 if( nbMots ==2 && (strcmp(mots,"HTTP/1.1") == 0 || strcmp(mots,"HTTP/1.0"))){
                 	printf("%s\n",mots);
                 	nbMots++;
-
+                	//printf("%d\n",nbMots );
                 }
                 
             }
+
+            if (nbMots ==3 ){
+            	return 0;
+            }
+            return 1;
+
         }
 
         int main (void)
@@ -102,7 +108,26 @@ void parse_request (char* mess_client,FILE * flux_client){
 
         		if((newP=fork()) == 0){
 
-        			parse_request(msg_client,flux_socket_client);
+
+        			char* response;
+        			int c_length;
+        			if(parse_request(msg_client,flux_socket_client)==0){
+        				response = "Bienvenue les amis !";
+        				c_length = strlen(response);
+        				printf("HTTP/1.1 200 OK\r\nConnection: close\r\nContent-Length: %d\r\n",c_length);
+        			}else{
+        				response = "400 Bad Request";
+        				c_length=strlen(response);
+        				printf("HTTP/1.1 %s\r\nConnection: close\r\nContent-Length: %d\r\n",response,c_length);
+
+
+        			}
+
+
+
+
+
+
         			fclose(flux_socket_client);
         			close(socket_client);
         			exit(0);
