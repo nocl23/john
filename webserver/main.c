@@ -39,7 +39,7 @@ void initialiser_signaux(void)
 int parse_request (char* mess_client,FILE * flux_client){
 	int nbMots=0;
 	char * mots;
-           // char * request;
+	int retour = 1;
 
 
             /* while(request!=NULL){
@@ -47,7 +47,8 @@ int parse_request (char* mess_client,FILE * flux_client){
             printf("%s",request );
             } 
               */
-            fgets( mess_client ,256,flux_client) ;
+
+           fgets( mess_client ,256,flux_client);
 
               //printf("%s\n",msg_client );
 
@@ -57,6 +58,7 @@ int parse_request (char* mess_client,FILE * flux_client){
                 if( nbMots==0 && strcmp(mots,"GET") == 0){ //verification du premier mot
                 	printf("%s ", mots);
                 	nbMots++;
+                	retour = 0;
                 }
 
                 mots = strtok(NULL," ");  // deuxieme mots
@@ -64,21 +66,23 @@ int parse_request (char* mess_client,FILE * flux_client){
                 if( nbMots ==1 || strcmp(mots,"/")==0){
                 	printf("%s ", mots);
                 	nbMots++;
+                	retour = 0;
 
                 }
                 mots = strtok (NULL,"\r\n");  //verification du 3e mot
-                if( nbMots ==2 && (strcmp(mots,"HTTP/1.1") == 0 || strcmp(mots,"HTTP/1.0"))){
+                if( nbMots ==2 && (strcmp(mots,"HTTP/1.1") == 0 || strcmp(mots,"HTTP/1.0")==0 )){
                 	printf("%s\n",mots);
                 	nbMots++;
-                	//printf("%d\n",nbMots );
+                	retour = 0;
+                	printf("%d\n",nbMots );
                 }
+                
                 
             }
 
-            if (nbMots ==3 ){
-            	return 0;
-            }
-            return 1;
+
+            printf("%d\n",retour );
+            return retour;
 
         }
 
@@ -104,10 +108,10 @@ int parse_request (char* mess_client,FILE * flux_client){
         /* traitement d ’ erreur */
         		}
 
-        		FILE *flux_socket_client = fdopen(socket_client,"w+");
+        		
 
         		if((newP=fork()) == 0){
-
+        			FILE *flux_socket_client = fdopen(socket_client,"w+");
 
         			char* response;
         			int c_length;
@@ -118,24 +122,16 @@ int parse_request (char* mess_client,FILE * flux_client){
         			}else{
         				response = "400 Bad Request";
         				c_length=strlen(response);
-        				printf("HTTP/1.1 %s\r\nConnection: close\r\nContent-Length: %d\r\n",response,c_length);
-
+        				sprintf("%s","HTTP/1.1 %s\r\nConnection: close\r\nContent-Length: %d\r\n",response,c_length);
 
         			}
 
-
-
-
-
-
-        			fclose(flux_socket_client);
-        			close(socket_client);
-        			exit(0);
-
+        			//close (socket_client);
+        			//exit(1);
         		}else{
 
         			close(socket_client);
-            //printf("socket_client fermeeeee\n");
+        			//printf("socket_client fermeeeee\n");
 
         		}
 
