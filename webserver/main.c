@@ -69,32 +69,47 @@ int main (void)
 
             int nbMots=0;
             char * mots;
-
-            fgets( msg_client , sizeof(msg_client),flux_socket_client) ;
-            mots = strtok(msg_client," ");
+           // char * request;
+           
             
+            /* while(request!=NULL){
+            request = fgets( msg_client , sizeof(msg_client),flux_socket_client) ;
+            printf("%s",request );
+            } 
+              */
+              fgets( msg_client , sizeof(msg_client),flux_socket_client) ;
+
+              //printf("%s\n",msg_client );
+
+            mots = strtok(msg_client," ");
             while ( mots != NULL ){
                 
-                if( nbMots==0 && strcmp(mots,"GET") == 0){ /*verification du premier mot*/
+                if( nbMots==0 && strcmp(mots,"GET") == 0){ //verification du premier mot
                     printf("%s ", mots);
                     nbMots++;
                 }
 
-                mots = strtok(NULL," ");   /*deuxieme mots*/
+                mots = strtok(NULL," ");  // deuxieme mots
 
                 if( nbMots ==1 || strcmp(mots,"/")==0){
                     printf("%s ", mots);
                     nbMots++;
+                    
                 }
-                mots = strtok (NULL,"\r\n");  /* verification du 3e mot*/
+                mots = strtok (NULL,"\r\n");  //verification du 3e mot
                 if( nbMots ==2 && (strcmp(mots,"HTTP/1.1") == 0 || strcmp(mots,"HTTP/1.0"))){
                     printf("%s\n",mots);
                     nbMots++;
+                    
                 }
                 
             }
 
+           
+            
 
+
+    
 
             fclose(flux_socket_client);
             close(socket_client);
