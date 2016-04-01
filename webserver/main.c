@@ -37,9 +37,9 @@ void initialiser_signaux(void)
 
 int avoid_line(char* buffer,int size, FILE* fd) {
     while( (strcmp(buffer,"\n") != 0) && (strcmp(buffer,"\r\n") != 0)) {
-        printf("boucle : %s\n", buffer);
+      //printf("boucle : %s\n", buffer);
         if (fgets(buffer,size,fd) == NULL) {
-            printf("c null \n");
+           // printf("c null \n");
             exit(1);
         }
     }
@@ -74,7 +74,7 @@ int parse_request (char* mess_client,FILE * flux_client){
                                 return 0;
                             }
 
-                            printf("%s\n", mots);
+                           // printf("%s\n", mots);
 
                             mots = strtok(NULL," ");
                             nbMots++;
@@ -93,7 +93,7 @@ int parse_request (char* mess_client,FILE * flux_client){
 
                        // printf("et ici\n");
                     }     else {
-                        printf("null\n");
+                      //  printf("null\n");
                         return 0;
                     }
 
@@ -135,8 +135,8 @@ int parse_request (char* mess_client,FILE * flux_client){
 
                             int rq = parse_request(msg_client,flux_socket_client);
                           //  printf("requeteeee%d\n",rq);
-                            int a  = avoid_line(msg_client, 256, flux_socket_client);
-                         //   printf("retour avoid %d\n", a);
+                            avoid_line(msg_client, 256, flux_socket_client);
+                          // printf("retour avoid %d\n", a);
                             if(rq){
                                 response = "Bienvenue les amis !";
                                 c_length = strlen(response);
