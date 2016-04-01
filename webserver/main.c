@@ -11,43 +11,9 @@
         #include <ctype.h>
         #include "socket.h"
 
-void traitement_signal ( int sig )
-{
-
-	int pid;
-	int status;
-	if((pid=waitpid(-1,&status,WNOHANG))>0){
-		printf ( " Signal % d reçu \n " , sig );
-	}
-
-}
 
 
-void initialiser_signaux(void)
-{
-	struct sigaction sa ;
-	sa.sa_handler = traitement_signal ;
-	sigemptyset (&sa.sa_mask);
-	sa.sa_flags = SA_RESTART ;
-	if ( sigaction ( SIGCHLD , & sa , NULL ) == -1)
-	{
-		perror ("sigaction(SIGCHLD)");
-	}
-}
-
-int avoid_line(char* buffer,int size, FILE* fd) {
-	while( (strcmp(buffer,"\n") != 0) && (strcmp(buffer,"\r\n") != 0)) {
-      //printf("boucle : %s\n", buffer);
-		if (fgets(buffer,size,fd) == NULL) {
-           // printf("c null \n");
-			exit(1);
-		}
-	}
-
-	return 1;
-}
-
-int parse_request (char* mess_client,FILE * flux_client,char * url){
+/*int parse_request (char* mess_client,FILE * flux_client,char * url){
 	int nbMots=0;
 	char * mots;
 
@@ -102,35 +68,48 @@ int parse_request (char* mess_client,FILE * flux_client,char * url){
 
                    // printf("je retourne 1\n");
                     return 1;
-                }
+                }*/
 
-                int main (void)
-                {
+int main (void)
+{
 
-                	initialiser_signaux();
-                	int socket_serveur = creer_serveur(8080);
-                	int socket_client ;
+  	initialiser_signaux();
+   	int socket_serveur = creer_serveur(8080);
+   	int status;
+   	int size = 256;
+
+   	while(1)
+   	{
+   		int socket_client = accept (socket_serveur, NULL, NULL);
+   		if(socket_client == -1)
+            {
+            	perror("accept");
+            	/* traitement d ’ erreur */
+             }
+	
+	    pid_t newP; 
+
+   		if((newP = fork()) == 0)
+   		{
+  			char *buffer = malloc(size);
+   			FILE *flux_client = fdopen(socket_client, "w+");
+   			fgets_or_exit(buffer, size, flux_client);
+   			free(buffer);
+   			fclose(flux_client);
+   			return 1; 
+        }
+    	printf("connexion acceptée\n") ;
+			if (waitpid(newP, &status, WNOHANG) == -1)
+			{
+				perror("erreur waitpid");
+            	close(socket_client);
+			}
+    }
+    return 0;
+}
 
 
-
-                	pid_t newP; 
-
-
-                	while(1)
-                	{
-
-                		socket_client = accept (socket_serveur, NULL, NULL);
-
-                		if(socket_client == -1)
-                		{
-                			perror("accept");
-                /* traitement d ’ erreur */
-                		}
-
-
-
-                		if ( (newP = fork()) == 0){
-                			FILE *flux_socket_client = fdopen(socket_client,"w+");
+/*FILE *flux_socket_client = fdopen(socket_client,"w+");
                             //parse_request(msg_client,flux_socket_client);
                 			char msg_client[256];
                 			char* response;
@@ -172,4 +151,6 @@ int parse_request (char* mess_client,FILE * flux_client,char * url){
 
                 	close(socket_serveur);
                 	return 0;
-                }
+                }*/
+
+
