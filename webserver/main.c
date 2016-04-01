@@ -71,11 +71,11 @@ int parse_request (char* mess_client,FILE * flux_client,char * url){
                         }else if((nbMots == 1 && strcmp(mots, "/") == 0))
                         {
                         	strcpy(url, mots);
-                        	printf("BATARD%s\n", url);
+                        	printf("url %s\n", url);
                         }
 
                         if (nbMots == 2 && (strcmp(mots, "HTTP/1.0") == 0 || strcmp(mots, "HTTP/1.1") == 0)) {
-                        	printf("%sPUTAIN DE MOTS",mots);
+                        	printf("%s",mots);
                         	printf("nb mots %d\n",nbMots );
                         	return 0;
                         }
