@@ -47,6 +47,14 @@ int creer_serveur(int port)
 	return socket_serveur;
 }
 
-
+char *fgets_or_exit(char *buffer, int size, FILE * stream)
+{
+	char *res = fgets(buffer, size, stream);
+	if(res == NULL)
+	{
+		return NULL;
+	}
+	return res;
+}
 
 	
